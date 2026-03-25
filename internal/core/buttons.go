@@ -154,6 +154,12 @@ func GetStartMarkup(chatID int64) tg.ReplyMarkup {
 				config.SupportChat,
 			),
 		).
+	    AddRow(
+			tg.Button.URL(
+				F(chatID, "SOURCE_BTN"),
+				"https://github.com/tusar404/ArcMusic",
+			),
+		).
 		Build()
 }
 
