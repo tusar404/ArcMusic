@@ -286,6 +286,4 @@ the Free Software Foundation, either version 3 of the License, or
 
 ---
 
-**Made with ❤️ by TheTeamVivek**
-
 **Happy Streaming! 🎶**
