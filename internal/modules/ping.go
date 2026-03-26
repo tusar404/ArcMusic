@@ -36,14 +36,17 @@ func init() {
 • Disk usage
 
 <b>💡 Use Case:</b>
-Check if the bot is alive and how the server is performing.`
+Check if bot is responsive and view system health.`
 }
 
 func formatUptime(d time.Duration) string {
-	days := int(d.Hours() / 24)
-	hours := int(d.Hours()) % 24
-	minutes := int(d.Minutes()) % 60
-	seconds := int(d.Seconds()) % 60
+	days := d / (24 * time.Hour)
+	d -= days * 24 * time.Hour
+	hours := d / time.Hour
+	d -= hours * time.Hour
+	minutes := d / time.Minute
+	d -= minutes * time.Minute
+	seconds := d / time.Second
 
 	result := ""
 	if days > 0 {
@@ -97,19 +100,19 @@ func pingHandler(m *tg.NewMessage) error {
 		cpuUsage = fmt.Sprintf("%.2f%%", percentages[0])
 	}
 
-	d, err := disk.Usage("/")
-	if err == nil {
+	if d, err := disk.Usage("/"); err == nil {
 		diskUsage = fmt.Sprintf("%.2f%%", d.UsedPercent)
 	}
 
-	pingText := F(m.ChannelID(), "ping_details", locales.Arg{
-		"latency": utils.IntToStr(int(latency)),
-		"uptime":  uptimeStr,
-		"cpu":     cpuUsage,
-		"ram":     ramInfo,
-		"disk":    diskUsage,
+	msg := F(m.ChannelID(), "ping_result", locales.Arg{
+		"latency":    latency,
+		"bot":        utils.MentionHTML(m.Client.Me()),
+		"uptime":     uptimeStr,
+		"ram_info":   ramInfo,
+		"cpu_usage":  cpuUsage,
+		"disk_usage": diskUsage,
 	})
 
-	utils.EOR(reply, pingText, opt)
+	reply.Edit(msg, opt)
 	return tg.ErrEndGroup
 }
