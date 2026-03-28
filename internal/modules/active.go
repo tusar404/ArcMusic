@@ -14,7 +14,7 @@ import (
 )
 
 func init() {
-	helpTexts["/active"] = `Show all active voice chat sessions.
+	helpTexts["/active"] = `<b>Show all active voice chat sessions.</b>
 
 <u>Usage:</u>
 <b>/active</b> or <b>/ac</b> — List active chats
