@@ -14,7 +14,7 @@ import (
 )
 
 func init() {
-	helpTexts["/active"] = `<i>Show all active voice chat sessions.</i>
+	helpTexts["/active"] = `Show all active voice chat sessions.
 
 <u>Usage:</u>
 <b>/active</b> or <b>/ac</b> — List active chats
@@ -37,23 +37,16 @@ Monitor exact bot usage.`
 func activeHandler(m *telegram.NewMessage) error {
 	chatID := m.ChannelID()
 
-	// Map to store unique, currently active voice chat connections
-	ntgChats := make(map[int64]struct{})
+	activeCount := 0
 
-	// Iterate through assistants and only count actual live NTG calls
-	core.Assistants.ForEach(func(a *core.Assistant) {
-		if a == nil || a.Ntg == nil {
-			return
+	// Iterate through all tracked room states natively in Go
+	for _, room := range core.GetAllRooms() {
+		if room != nil && room.IsActiveChat() {
+			activeCount++
 		}
-		for id := range a.Ntg.Calls() {
-			ntgChats[id] = struct{}{}
-		}
-	})
+	}
 
-	// The exact number of active voice chats
-	activeCount := len(ntgChats)
-
-	// Send the exact count without the broken/stale logic
+	// Send the exact count
 	msg := F(chatID, "active_chats_info", locales.Arg{
 		"count": activeCount,
 	})
