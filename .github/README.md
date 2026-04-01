@@ -3,16 +3,21 @@
 <p align="center">
   <i>A blazing-fast, reliable, and feature-packed Telegram bot for streaming music in group voice chats — built with Go.</i>
 </p>
+
+<p align="center">
+  <b>🤖 Demo Bot:</b> <a href="https://telegram.dog/ArcTunesBot?start=help">@ArcTunesBot</a>
+</p>
+
 <p align="center">
 
   <a href="https://go.dev/">
     <img src="https://img.shields.io/badge/Go-1.25-00ADD8?style=for-the-badge&logo=go&labelColor=000000&logoColor=white" alt="Go Version">
   </a>
-  <a href="https://github.com/tusar404/ArcMusic/releases/tag/v3.2.0">
-    <img src="https://img.shields.io/badge/Version-v3.2-FF9800?style=for-the-badge&logo=semver&labelColor=000000&logoColor=white" alt="Version">
+  <a href="https://github.com/tusar404/ArcMusic/releases/tag/v1.0.0">
+    <img src="https://img.shields.io/badge/Version-v1.0.0-FF9800?style=for-the-badge&logo=semver&labelColor=000000&logoColor=white" alt="Version">
   </a>
   <a href="../LICENSE">
-    <img src="https://img.shields.io/badge/License-GPLv3-FF3860?style=for-the-badge&logo=gnu&labelColor=000000&logoColor=white" alt="License: GPLv3">
+    <img src="https://img.shields.io/badge/License-GPLv1-FF3860?style=for-the-badge&logo=gnu&labelColor=000000&logoColor=white" alt="License: GPLv3">
   </a>
   <a href="https://github.com/tusar404/ArcMusic/stargazers">
     <img src="https://img.shields.io/github/stars/tusar404/ArcMusic?style=for-the-badge&label=Stars&labelColor=000000&color=FFD700&logo=github&logoColor=white" alt="GitHub Stars">
@@ -119,6 +124,7 @@ See **[Configuration Reference](../internal/config/README.md)** for complete lis
 | `/seek <seconds>` | Seek to specific position |
 | `/loop <count>` | Loop track N times |
 | `/shuffle` | Toggle shuffle mode |
+| `/playmode` | Toggle Play command |
 | `/speed <speed>` | Set playback speed (0.5-4.0x) |
 | `/skip` | Skip to next track |
 | `/fplay <query>` | Force play (skip queue) |
@@ -154,7 +160,7 @@ YukkiMusic uses a **modular platform system** to support multiple music sources:
 1. **Telegram** (Priority: 100) - Direct Telegram audio/video files
 2. **YouTube** (Priority: 90) - YouTube videos and playlists
 3. **Youtubify API** (Priority: 80) - Premium YouTube downloads
-4. **Arc API** (Priority: 75) - YouTube downloads via Arc API
+4. **Arc API** (Priority: 75) - YouTube downloads via Arc API. [🌟 Register and start your free trial now! 🌟](https://deadlinetech.site/register)
 5. **YT-DLP** (Priority: 70) - Direct yt-dlp integration
 
 ### How It Works
@@ -245,7 +251,7 @@ See **[Platform System Guide](../internal/platforms/README.md#-how-to-add-a-new-
 
 ## 📜 License
 
-This project is licensed under the **GNU General Public License v3.0** - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the **GNU General Public License v1.0** - see the [LICENSE](LICENSE) file for details.
 
 ```
 ArcMusic — A Telegram bot that streams music into group voice chats
@@ -270,8 +276,8 @@ the Free Software Foundation, either version 3 of the License, or
 
 ## 📞 Support
 
-- **Telegram Support Chat**: [@ArcChatz](https://t.me/ArcChatz)
-- **Updates Channel**: [@ArcUpdates](https://t.me/ArcUpdates)
+- **Telegram Support Chat**: [@ArcChatz](https://telegram.dog/ArcChatz)
+- **Updates Channel**: [@ArcUpdates](https://telegram.dog/ArcUpdates)
 - **GitHub Issues**: [Report bugs](https://github.com/tusar404/ArcMusic/issues)
 
 ---
