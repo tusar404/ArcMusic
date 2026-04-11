@@ -65,13 +65,6 @@ func handleParticipantUpdate(p *telegram.ParticipantUpdate) error {
 	oldStatus := getParticipantStatus(p.Old)
 	newStatus := getParticipantStatus(p.New)
 
-	gologging.DebugF(
-		"participant change %d: %s -> %s",
-		userID,
-		oldStatus,
-		newStatus,
-	)
-
 	switch {
 
 	case (newStatus == "administrator" || newStatus == "creator") &&
