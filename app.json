@@ -8,32 +8,32 @@
     "env": {
         "API_ID": {
             "description": "Your Telegram API ID from my.telegram.org.",
-            "value": "",
+            "value": "11232524",
             "required": true
         },
         "API_HASH": {
             "description": "Your Telegram API Hash from my.telegram.org.",
-            "value": "",
+            "value": "2338755ff158ae1ea5459d0838a07413",
             "required": true
         },
         "TOKEN": {
             "description": "Your Telegram bot token from @BotFather.",
-            "value": "",
+            "value": "8906815149:AAEdo4c84gtHhkyhOhia3fQTVpaU5esdZpc",
             "required": true
         },
         "MONGO_DB_URI": {
             "description": "Your MongoDB connection string.",
-            "value": "",
+            "value": "mongodb+srv://music1ygffygfgdf_db_user:music1ygffygfgdf_db_user@cluster0.0lbiwen.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
             "required": true
         },
         "STRING_SESSION": {
             "description": "A Pyrogram string session for the assistant.",
-            "value": "",
+            "value": "1BZWaqwUAUFxME0W_71aDZI8MBuOyU7ik-ULqbaL-So33ZkKsTa9u6AecPqXa0TYveymzq-91MojmbzgxBJlEBauRKNmTaU5Nuv1QAdcI8sAG-WCagFvbabOOqx3LTaDoc1GloRPtUrmVZenbzmrEOv9sGyqy3fhaf9yQC5KoH4byiO1LxsmLKIDXwQt9JwfaPG9cRHRJNx5dlt9Bu5gKBlKqIIdAATw6CZPJpswIHCAElgIw2weKLd8bMVmRQ9ciEXYcpfx9TYRzoiW-3W6SUOXJqm2ofLsLuMHbF1dP0oGzmONpVkmuKCIwMzKH0zsifq6f2jpA2_bJWVgrZUETP9WuG9SJ67E=",
             "required": true
         },
         "ARC_API_KEY": {
             "description": "API key for Arc API (optional). You can get one from https://deadlinetech.site . If you are using cookies, you can leave this empty.",
-            "value": "",
+            "value": "ARCe93c0192df6c8af85ed243",
             "required": false
         },
         "ARC_API_URL": {
@@ -43,12 +43,12 @@
         },
         "OWNER_ID": {
             "description": "The Telegram user ID of the bot's owner.",
-            "value": "",
+            "value": "8596638679",
             "required": true
         },
         "LOGGER_ID": {
             "description": "The Telegram chat ID where logs will be sent.",
-            "value": "",
+            "value": "-1004298735750",
             "required": false
         },
         "DURATION_LIMIT": {
