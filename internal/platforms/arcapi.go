@@ -19,7 +19,9 @@ import (
 	"github.com/amarnathcjd/gogram/telegram"
 
 	"main/internal/config"
+	"main/internal/core"
 	state "main/internal/core/models"
+	"main/internal/utils"
 )
 
 const PlatformArcApi state.PlatformName = "ArcApi"
@@ -59,22 +61,29 @@ func (f *ArcApiPlatform) Download(
 	statusMsg *telegram.NewMessage,
 ) (string, error) {
 
-	// Check local cache just in case the file was historically downloaded
 	if f := findFile(track); f != "" {
 		gologging.Debug("ArcApi: Download -> Local Cached File -> " + f)
 		return f, nil
 	}
 
-	gologging.Debug("ArcApi: Fetching direct streaming URL from API V2")
-
-	dlURL, err := f.v2Download(ctx, track)
+	cdn, err := f.v2Download(ctx, track)
 	if err != nil {
 		gologging.ErrorF("ArcApi: V2 URL fetch failed: %v", err)
 		return "", err
 	}
 
+	if telegramExtractRegex.MatchString(cdn) {
+		path, err := f.downloadFromTelegramLink(ctx, cdn, track, statusMsg)
+		if err != nil {
+			gologging.ErrorF("ArcApi: Telegram CDN download failed: %v", err)
+			return "", err
+		}
+		gologging.Info(fmt.Sprintf("✅ V2-API Telegram CDN | %s | Video: %t", track.ID, track.Video))
+		return path, nil
+	}
+
 	gologging.Info(fmt.Sprintf("✅ V2-API Direct Stream | %s | Video: %t", track.ID, track.Video))
-	return dlURL, nil
+	return cdn, nil
 }
 
 func (*ArcApiPlatform) CanSearch() bool { return false }
@@ -112,25 +121,63 @@ func (f *ArcApiPlatform) v2Download(ctx context.Context, track *state.Track) (st
 		return "", fmt.Errorf("api returned error status: %d", resp.StatusCode())
 	}
 
-	candidate := f.extractCandidate(respData)
-	if candidate != "" && !strings.Contains(strings.ToLower(candidate), "processing") && !strings.Contains(strings.ToLower(candidate), "queued") {
-		return f.normalizeURL(candidate, apiURL), nil
+	if cdn := f.extractCandidate(respData); cdn != "" {
+		return f.normalizeURL(cdn, apiURL), nil
 	}
 
-	status, _ := respData["status"].(string)
-	if status == "queued" || status == "processing" {
-		jobID := f.extractJobID(respData)
-		if jobID != "" {
-			gologging.DebugF("ArcApi: Polling Job ID: %s", jobID)
-
-			dlURL := f.pollJobStatus(ctx, jobID)
-			if dlURL != "" {
-				return f.normalizeURL(dlURL, apiURL), nil
-			}
-		}
+	jobID := f.extractJobID(respData)
+	if jobID == "" {
+		return "", errors.New("failed to extract cdn or job_id from api")
 	}
 
-	return "", errors.New("failed to extract download url or job_id from api")
+	gologging.DebugF("ArcApi: Polling Job ID: %s", jobID)
+
+	dlURL := f.pollJobStatus(ctx, jobID)
+	if dlURL == "" {
+		return "", errors.New("job polling did not return a cdn url")
+	}
+
+	return f.normalizeURL(dlURL, apiURL), nil
+}
+
+func (f *ArcApiPlatform) downloadFromTelegramLink(
+	ctx context.Context,
+	link string,
+	track *state.Track,
+	statusMsg *telegram.NewMessage,
+) (string, error) {
+	matches := telegramExtractRegex.FindStringSubmatch(link)
+	if len(matches) < 4 {
+		return "", fmt.Errorf("invalid telegram cdn link: %s", link)
+	}
+
+	username := matches[2]
+	messageID, err := strconv.Atoi(matches[3])
+	if err != nil {
+		return "", fmt.Errorf("invalid telegram cdn link message id: %w", err)
+	}
+
+	msg, err := core.Bot.GetMessageByID(username, int32(messageID))
+	if err != nil {
+		return "", fmt.Errorf("failed to fetch telegram cdn message: %w", err)
+	}
+
+	ext := ".mp3"
+	if track.Video {
+		ext = ".mp4"
+	}
+	path := getPath(track, ext)
+
+	if fileExists(path) {
+		return path, nil
+	}
+
+	dOpts := &telegram.DownloadOptions{FileName: path, Ctx: ctx}
+	if statusMsg != nil {
+		dOpts.ProgressManager = utils.GetProgress(statusMsg)
+	}
+
+	return msg.Download(dOpts)
 }
 
 func (f *ArcApiPlatform) pollJobStatus(ctx context.Context, jobID string) string {
@@ -177,8 +224,8 @@ func (f *ArcApiPlatform) pollJobStatus(ctx context.Context, jobID string) string
 		}
 
 		if result, ok := job["result"].(map[string]any); ok {
-			if pubURL, ok := result["public_url"].(string); ok && pubURL != "" {
-				return pubURL
+			if cdn, ok := result["cdn"].(string); ok && cdn != "" {
+				return cdn
 			}
 		}
 
@@ -188,36 +235,18 @@ func (f *ArcApiPlatform) pollJobStatus(ctx context.Context, jobID string) string
 }
 
 func (f *ArcApiPlatform) extractCandidate(data map[string]any) string {
-	if job, ok := data["job"].(map[string]any); ok {
-		if res, ok := job["result"].(map[string]any); ok {
-			for _, k := range []string{"public_url"} {
-				if v, ok := res[k].(string); ok && strings.TrimSpace(v) != "" {
-					return strings.TrimSpace(v)
-				}
-			}
-		}
-	}
 	if res, ok := data["result"].(map[string]any); ok {
-		for _, k := range []string{"public_url"} {
-			if v, ok := res[k].(string); ok && strings.TrimSpace(v) != "" {
-				return strings.TrimSpace(v)
-			}
-		}
-	}
-	for _, k := range []string{"public_url"} {
-		if v, ok := data[k].(string); ok && strings.TrimSpace(v) != "" {
+		if v, ok := res["cdn"].(string); ok && strings.TrimSpace(v) != "" {
 			return strings.TrimSpace(v)
 		}
+	}
+	if v, ok := data["cdn"].(string); ok && strings.TrimSpace(v) != "" {
+		return strings.TrimSpace(v)
 	}
 	return ""
 }
 
 func (f *ArcApiPlatform) extractJobID(data map[string]any) string {
-	if job, ok := data["job"].(map[string]any); ok {
-		if id, ok := job["id"].(string); ok {
-			return id
-		}
-	}
 	if id, ok := data["job_id"].(string); ok {
 		return id
 	}
