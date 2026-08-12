@@ -8,12 +8,12 @@
     "env": {
         "API_ID": {
             "description": "Your Telegram API ID from my.telegram.org.",
-            "value": "",
+            "value": "37050443",
             "required": true
         },
         "API_HASH": {
             "description": "Your Telegram API Hash from my.telegram.org.",
-            "value": "",
+            "value": "8185f8136bee5f1090106197a93f8406",
             "required": true
         },
         "TOKEN": {
